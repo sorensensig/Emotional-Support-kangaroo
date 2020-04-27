@@ -26,9 +26,10 @@ if (!portNum) {
         parser.on('data', line => {
             switch(line){
                 case "record":
+                    console.log(line);
                     break;
                 case "stopRecord":
-                    
+                    console.log(line);
                     socket.emit('message', line);
                     break;
             }
