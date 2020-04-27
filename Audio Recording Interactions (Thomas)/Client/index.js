@@ -78,7 +78,7 @@ if (!portNum) {
                     (async () => {
                         audio = await recorder.stop();
                     })();
-                    socket.emit('message', audio);
+                    socket.emit('audio', audio);
                     break;
             }
             

@@ -22,19 +22,21 @@ if (!portNum) {
     var socket = io.connect('http://supparoo.uqcloud.net');
     socket.on('connect', function () {
         console.log("Connected");
+
+        let audio;
         // Reading info from arduino, then sending that info to the server tagging as "message"
         parser.on('data', line => {
             switch(line){
                 case "play":
-                    // send play 
-                    socket.emit('message', line);
+                    // play audio
                     break;
             }
         });
 
-        socket.on('response', function (rgb) {
+        socket.on('audio', payload => {
             // send rgb values file to Arduino
-            port.write(rgb);
+            audio = payload.audio
+            port.write(payload.colour);
         });
         // For debuggin purposes
         
