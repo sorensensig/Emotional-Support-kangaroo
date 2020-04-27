@@ -32,10 +32,10 @@ if (!portNum) {
                     break;
             }
         });
-
+``
         socket.on('audio', payload => {
             // send rgb values file to Arduino
-            audio = payload.audio
+            audio = payload.audio;
             port.write(payload.colour);
         });
         // For debuggin purposes

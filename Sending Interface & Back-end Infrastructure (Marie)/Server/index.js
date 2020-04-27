@@ -16,6 +16,11 @@ io.on('connection', function (socket) {
         io.emit('message', "received");
     });
 
+    socket.on('audio', payload => {
+      socket.broadcast.emit('audio', payload);
+      // send confirmation?
+    });
+
     socket.on('disconnect', function () {
         console.log("User disconnected");
     });

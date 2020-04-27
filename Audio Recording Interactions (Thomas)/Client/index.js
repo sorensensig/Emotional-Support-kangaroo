@@ -78,7 +78,9 @@ if (!portNum) {
                     (async () => {
                         audio = await recorder.stop();
                     })();
-                    socket.emit('audio', audio);
+                    const colour = '255,0,0';
+                    let payload = { audio, colour};
+                    socket.emit('audio', payload);
                     break;
             }
             
