@@ -25,7 +25,7 @@ if (!portNum) {
         // Reading info from arduino, then sending that info to the server tagging as "message"
         parser.on('data', line => {
             switch(line){
-                case "play ":
+                case "play":
                     // send play 
                     socket.emit('message', line);
                     break;
