@@ -16,11 +16,16 @@ io.on('connection', function (socket) {
         io.emit('message', "received");
     });
 
+    socket.on('audio', payload => {
+      socket.broadcast.emit('audio', payload);
+      // send confirmation?
+    });
+
     socket.on('disconnect', function () {
         console.log("User disconnected");
     });
 });
 
-http.listen(3000, function () {
-    console.log("Listening on *:3000")
+http.listen(80, function () {
+    console.log("Listening on *:80")
 });
