@@ -70,16 +70,20 @@ if (!portNum) {
           //  recorder = await recordAudio();
           //})();
 
+          line = parseInt(line);
+
             switch(line){
-                case "record":
+                case 1:
                     //recorder.start();
+                    console.log("IS RECORDING!");
                     break;
-                case "stopRecord":
+                case 0:
+                    console.log("STAAAAAAAHP!");
                     //(async () => {
                         //audio = await recorder.stop();
                     //})();
-                    const colour = "100-100-0";
-                    let payload = { audio, colour};
+                    const colour = "255,0,255";
+                    let payload = {audio, colour};
                     console.log("Sending");
                     socket.emit('audio', payload);
                     console.log("Sent");
@@ -88,12 +92,12 @@ if (!portNum) {
             
         });
         
-        let audio = "no work";
-        const colour = "255,0,255";
-        let payload = { audio, colour};
-        console.log("Sending");
-        socket.emit('audio', payload);
-        console.log("Sent");
+        // let audio = "no work";
+        // const colour = "255,0,255";
+        // let payload = { audio, colour};
+        // console.log("Sending");
+        // socket.emit('audio', payload);
+        // console.log("Sent");
         // For debuggin purposes
         
     });
