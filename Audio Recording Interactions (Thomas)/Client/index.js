@@ -62,7 +62,7 @@ if (!portNum) {
     socket.on('connect', function () {
         console.log("Connected");
         let counter = 0;
-        const colours = ["255,0,0", "255,0,255", "255,255,0", "0,255,255"];
+        const colours = ["255,0,0",, "0,255,0", "0,0,255", "255,0,255", "255,255,0", "0,255,255"];
         // Reading info from arduino, then sending that info to the server tagging as "message"
         parser.on('data', line => {
           // let recorder;
