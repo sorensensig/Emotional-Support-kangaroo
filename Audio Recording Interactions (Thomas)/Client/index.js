@@ -58,9 +58,11 @@ if (!portNum) {
     const parser = new Readline();
     port.pipe(parser);
     
-    var socket = io.connect('http://supparoo.uqcloud.net');
+    const socket = io.connect('http://supparoo.uqcloud.net');
     socket.on('connect', function () {
         console.log("Connected");
+        let counter = 0;
+        const colours = ["255,0,0", "255,0,255", "255,255,0", "0,255,255"];
         // Reading info from arduino, then sending that info to the server tagging as "message"
         parser.on('data', line => {
           // let recorder;
@@ -82,7 +84,11 @@ if (!portNum) {
                     //(async () => {
                         //audio = await recorder.stop();
                     //})();
-                    const colour = "255,0,255";
+                    counter++;
+                    if (counter > colour.length){
+                        counter = 0;
+                    }
+                    let colour = colours[counter];
                     let payload = {audio, colour};
                     console.log("Sending");
                     socket.emit('audio', payload);
