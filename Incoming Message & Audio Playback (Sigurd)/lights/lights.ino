@@ -10,7 +10,7 @@ bool audioPlayed = false;
 
 int bendPin = A0;
 int bendVal = 0;
-int bendThreshold = 420;
+int bendThreshold = 400;
 
 int redValue = 0;
 int greenValue = 0;
@@ -114,7 +114,7 @@ void loop() {
 
 void runHapticFeedback() {
   digitalWrite(hapticPin, HIGH);
-  delay(40);
+  delay(100);
   digitalWrite(hapticPin, LOW);
 }
 
