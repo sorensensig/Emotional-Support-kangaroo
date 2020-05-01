@@ -85,7 +85,7 @@ if (!portNum) {
                         //audio = await recorder.stop();
                     //})();
                     counter++;
-                    if (counter >= colour.length-1){
+                    if (counter >= colours.length){
                         counter = 0;
                     }
                     let colour = colours[counter];
