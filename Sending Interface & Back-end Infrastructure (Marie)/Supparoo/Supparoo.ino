@@ -7,6 +7,7 @@ const int ledPin = 8;
 const int numLeds = 12;
 CRGB leds[numLeds];
 MPU6050 accMeter;
+const int vibPin = 9;
 
 // orientation/motion vars
 Quaternion qu;           // [w, x, y, z]         quaternion container
@@ -40,6 +41,7 @@ void setup() {
   }
   randomSeed(analogRead(0));
   ledOn();
+  pinMode(vibPin, OUTPUT);
 }
 
 void loop(){
@@ -64,7 +66,7 @@ void ledOn(){
   int b = random(255);
   
   for(int i = 0; i < numLeds; i++){
-    leds[i] = CRGB(r, g, b);
+    leds[i] = CRGB(0, 255, 0);
   }
   FastLED.show();
 } 
@@ -98,6 +100,17 @@ bool isThrown(){
 
 void sendData(){
   Serial.println("Sending!");
-  delay(500);
+  delay(1000);
+  vibrateOn();
+  delay(1000);
+  vibrateOff();
   ledOff();
+}
+
+void vibrateOn(){
+  digitalWrite(vibPin, HIGH);
+}
+
+void vibrateOff(){
+  digitalWrite(vibPin, LOW);
 }
