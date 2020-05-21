@@ -22,13 +22,6 @@ Better performance may be seen using the SdFat library. See included example for
 Running the Arduino from a battery or filtered power supply will reduce noise.
 */
 
-#include <SD.h>
-#include <SPI.h>
-#include <TMRpcm.h>
-
-#define SD_ChipSelectPin 10  //example uses hardware SS pin 53 on Mega2560
-//#define SD_ChipSelectPin 4  //using digital pin 4 on arduino nano 328, can use other pins
-
 #include <Adafruit_NeoPixel.h>
 #ifdef __AVR__
  #include <avr/power.h> // Required for 16 MHz Adafruit Trinket
@@ -39,8 +32,6 @@ Running the Arduino from a battery or filtered power supply will reduce noise.
 #define PIXEL_COUNT 8  // Number of NeoPixels
 
 Adafruit_NeoPixel strip(PIXEL_COUNT, PIXEL_PIN, NEO_GRB + NEO_KHZ800);
-
-TMRpcm audio;   // create an object for use in this sketch 
 
 const int buttonPin = 10;
 
@@ -95,11 +86,11 @@ void loop() {
   //  delay(500);
 
 
-    buttonRead = digitalRead(buttonPin);
-    if(flexValue < 380 && !isRecording){
-      isRecording = true;
-      Record();
-    }
+  //buttonRead = digitalRead(buttonPin);
+  if(flexValue < 380 && !isRecording){
+    isRecording = true;
+    Record();
+  }
 }
 
 void Record(){
