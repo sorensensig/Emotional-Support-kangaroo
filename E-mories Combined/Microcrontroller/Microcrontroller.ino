@@ -1,6 +1,6 @@
 #include <Adafruit_NeoPixel.h>
 
-#define PIXEL_PIN    6  // Digital IO pin connected to the NeoPixels.
+#define PIXEL_PIN 6  // Digital IO pin connected to the NeoPixels.
 #define PIXEL_COUNT 8  // Number of NeoPixels
 
 Adafruit_NeoPixel pixels(PIXEL_COUNT, PIXEL_PIN, NEO_GRB + NEO_KHZ800);
@@ -212,4 +212,21 @@ void reset() {
     tempGreen = 0;
     tempBlue = 0;
     setColor(redValue,greenValue, blueValue);
+}
+
+// TUVA, put your code in this here function
+void selectColor() {
+  // add color values here, Red at index 0, Green at index 1, and Blue at index 2.
+  int color[] = {};
+
+  // Your code
+
+  sendMessage(color);
+}
+
+// MARIE, put your code in this here function.
+// the client will need to be fixed as well before this works.
+void sendMessage(color) {
+  // your code
+  Serial.println(color);
 }

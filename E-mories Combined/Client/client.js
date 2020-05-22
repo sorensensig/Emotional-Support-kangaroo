@@ -60,6 +60,9 @@ if (!portNum) {
         break;
       }
     });
+    
+    // Change the above switch statement with the code underneath when all prototypes are put together
+    // socket.emit('audio', payload);
 
     socket.on('audio', payload => {
       let arr = covertRGB(payload.colour);
