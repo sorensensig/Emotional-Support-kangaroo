@@ -19,18 +19,15 @@ bool vibrating = false;
 bool on;
 
 int savingCounter = 0;
-int fadingNumber = 5;
-int fadingNumberTwo = 255;
 
 bool isRecording = false;
 
-int saveValue; //save analog value
 int flexValue;
+int flexGoal = 380;
 
 void setup() {
   Serial.begin(115200);
-  pinMode(buttonPin, INPUT_PULLUP);
-  pinMode(A1,INPUT);
+  pinMode(flexPin,INPUT);
   pinMode(vibrate, OUTPUT);
 
 
@@ -45,21 +42,20 @@ void setup() {
 void loop() {
    flexValue = analogRead(flexPin);         //Read and save analog value from potentiometer
   
-  if(flexValue < 380 && !isRecording){
+  if(flexValue < flexGoal && !isRecording){
     isRecording = true;
     Record();
   }
 }
 
 void Record(){
-  redPower = 0;
   pixelNumber = 0;
   on = false;
   Serial.println(1);
   
   vibrating = true;
   
-  while(flexValue < 380  ){
+  while(flexValue < flexGoal  ){
     flexValue = analogRead(flexPin);         //Read and save analog value from potentiometer
     buttonRead = digitalRead(buttonPin);
     digitalWrite(vibrate, HIGH);
