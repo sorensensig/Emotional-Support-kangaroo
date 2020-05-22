@@ -12,7 +12,7 @@ int bendVal = 0;
 const int bendThreshold = 340;
 
 long timer = 0;
-float threshold = 1.20;
+float threshold = 1.70;
 int count = 0;
 int randomColourCount = 0;
 bool haveBeenShaken = false;
@@ -61,7 +61,7 @@ void setup() {
 void loop() {
   mpu6050.update();
   
-  flexValue = analogRead(flexPin);         //Read and save analog value from potentiometer
+  bendVal = analogRead(bendPin);         //Read and save analog value from potentiometer
   if(bendVal < bendThreshold) squeeze();
   
   switch(curState){
@@ -82,9 +82,7 @@ void handleShake(){
     haveBeenShaken = true;
     if (count > 2){
         //starting the vibration  
-        vibrate(100);
-        delay(100);
-        vibrate(100);
+        vibrate(1000);
     }
   }else if(haveBeenShaken && count > 2){
       //Choose from 10 first random colours
@@ -113,8 +111,11 @@ void squeeze(){
   switch(curState){
     case SHAKE:
       Serial.println("Changed state");
-      vibrate(1000);
+      vibrate(500);
+      delay(100);
+      vibrate(100);
       curState = THROW;
+      delay(1000);
       break;
     default:
       break;
@@ -151,7 +152,9 @@ void vibrate(int duration){
 void sendData(){
   Serial.println("Sending!");
   delay(1000);
-  vibrate(1000);
+  vibrate(100);
+  delay(100);
+  vibrate(100);
   ledOff();
   curState = INITIAL;
 }
