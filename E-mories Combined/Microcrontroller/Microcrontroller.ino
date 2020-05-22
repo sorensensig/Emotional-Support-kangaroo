@@ -178,6 +178,7 @@ void StopRecord(){
   delay(500);
   lightUpAllLights(pixels.Color(0, 0, 0), 50);  
   
+  // selectColor();
   Serial.println(0);
 }
 
@@ -218,9 +219,7 @@ void reset() {
 void selectColor() {
   // add color values here, Red at index 0, Green at index 1, and Blue at index 2.
   int color[] = {};
-
   // Your code
-
   sendMessage(color);
 }
 
