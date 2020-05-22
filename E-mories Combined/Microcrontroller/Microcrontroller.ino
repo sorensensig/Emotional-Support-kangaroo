@@ -196,10 +196,10 @@ void setColor(int red, int green, int blue) {
 }
 
 void lightUpAllLights(uint32_t color, int wait){
-  strip.clear();
-  for(int i=0; i<strip.numPixels(); i++) { // For each pixel in strip...
-    strip.setPixelColor(i, color);         //  Set pixel's color (in RAM)
-    strip.show();                          //  Update strip to match
+  pixels.clear();
+  for(int i=0; i<pixels.numPixels(); i++) { // For each pixel in strip...
+    pixels.setPixelColor(i, color);         //  Set pixel's color (in RAM)
+    pixels.show();                          //  Update strip to match
     delay(wait);                           //  Pause for a moment
   }
 }
