@@ -4,7 +4,7 @@ const io = require('socket.io-client');
 const SerialPort = require('serialport');
 const Readline = require('@serialport/parser-readline');
 
-const portNum = process.argv.slice(2)[0];
+const portNum = 'COM5';
 //const portNum = "/dev/cu.usbmodem14301";
 
 if (!portNum) {
@@ -25,8 +25,43 @@ if (!portNum) {
 
     // let audio;
     // Reading info from arduino, then sending that info to the server tagging as "message"
-    parser.on('data', line => socket.emit('message', line));
+    
+    let counter = 0;
+    const colours = ["255,0,0", "0,255,0", "0,0,255", "255,0,255", "255,255,0", "0,255,255"];
+    // Reading info from arduino, then sending that info to the server tagging as "message"
+    parser.on('data', line => {
+      // let recorder;
+    let audio = "no work";
+  
+    //(async () => {
+    //  recorder = await recordAudio();
+    //})();
 
+    line = parseInt(line);
+
+    switch(line){
+      case 1:
+        //recorder.start();
+        console.log("IS RECORDING!");
+        break;
+      case 0:
+        console.log("STAAAAAAAHP!");
+        //(async () => {
+          //audio = await recorder.stop();
+        //})();
+        counter++;
+        if (counter >= colours.length){
+          counter = 0;
+        }
+        let colour = colours[counter];
+        let payload = {audio, colour};
+        console.log("Sending");
+        socket.emit('audio', payload);
+        console.log("Sent");
+        break;
+      }
+    });
+    
     socket.on('audio', payload => {
       let arr = covertRGB(payload.colour);
       port.write(arr);
