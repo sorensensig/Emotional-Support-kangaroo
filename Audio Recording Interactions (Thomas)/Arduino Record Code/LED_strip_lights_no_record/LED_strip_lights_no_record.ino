@@ -1,10 +1,6 @@
 #include <Adafruit_NeoPixel.h>
 
-#ifdef __AVR__
- #include <avr/power.h> // Required for 16 MHz Adafruit Trinket
-#endif
-
-#define PIXEL_PIN    6  // Digital IO pin connected to the NeoPixels.
+#define PIXEL_PIN 6  // Digital IO pin connected to the NeoPixels.
 
 #define PIXEL_COUNT 8  // Number of NeoPixels
 
@@ -20,8 +16,6 @@ const int flexPin = A1; //pin A0 to read analog input
 const int vibrate = 2;
 bool vibrating = false;
 
-int redPower = 0;
-int yellowPower = 0;
 bool on;
 
 int savingCounter = 0;
@@ -84,13 +78,11 @@ void Record(){
 }
 
 void StopRecord(){
-  yellowPower = 0;
   on = false;
 
   digitalWrite(vibrate, LOW);
   
   savingCounter = 5;
-  yellowPower = 0;
   while(savingCounter > 0){
     if(!on){
       lightUpAllLights(strip.Color(255, 150, 0), 50); 
