@@ -1,9 +1,15 @@
 #include <Adafruit_NeoPixel.h>
+#include <MPU6050_tockn.h>
+#include <Wire.h>
 
 #define PIXEL_PIN 6  // Digital IO pin connected to the NeoPixels.
+//#define PIXEL_PIN 14 //Tuva's Neopixel Pin
 #define PIXEL_COUNT 8  // Number of NeoPixels
 
 Adafruit_NeoPixel pixels(PIXEL_COUNT, PIXEL_PIN, NEO_GRB + NEO_KHZ800);
+
+//Setup accelerometer with MPU library
+MPU6050 mpu6050(Wire);
 
 int hapticPin = 2;
 int bendPin = A1;
@@ -14,7 +20,8 @@ bool lightsOn = false;
 bool messageReceived = false;
 
 int bendVal = 0;
-int bendThreshold = 340;
+int bendThreshold = 340; 
+//int bendThreshold = 3000; Values for Tuva
 
 int savingCounter = 0;
 
@@ -28,10 +35,16 @@ int arr[] = {redValue, greenValue, blueValue};
 
 void setup() {
   Serial.begin(115200);
+  //Serial.begin(9600); Value working for Tuva
   pixels.begin();
   pinMode(hapticPin, OUTPUT);
   pinMode(bendPin, INPUT);
   lightUpAllLights(pixels.Color(0, 0, 0), 0);
+
+  //Accelerometer setup
+  Wire.begin();
+  mpu6050.begin();
+  mpu6050.calcGyroOffsets(true);
 }
 void loop() {
   
@@ -50,6 +63,7 @@ void loop() {
   }
 
   bendVal = analogRead(bendPin);
+  
   if(messageReceived) {
     if(bendVal < bendThreshold) {
       audioPlayed = true;
@@ -177,9 +191,9 @@ void StopRecord(){
   lightUpAllLights(pixels.Color(0, 255, 0), 50);  
   delay(500);
   lightUpAllLights(pixels.Color(0, 0, 0), 50);  
+
   
-  // selectColor();
-  Serial.println(0);
+  selectColor();
 }
 
 void runHapticFeedback() {
@@ -215,17 +229,45 @@ void reset() {
     setColor(redValue,greenValue, blueValue);
 }
 
-// TUVA, put your code in this here function
+// TUVAs function
 void selectColor() {
-  // add color values here, Red at index 0, Green at index 1, and Blue at index 2.
-  int color[] = {};
-  // Your code
+  bool colorSelected = false;
+  int R, G, B;
+  
+  while(!colorSelected){
+    mpu6050.update();
+    float x, y, z;
+  
+    x = mpu6050.getAngleX();
+    y = mpu6050.getAngleY();
+    z= mpu6050.getAngleZ();
+  
+    int highValue = 150;
+    int rgbHighValue = 150;
+    R = map(x, 0, highValue, 0, rgbHighValue);
+    G = map(y, 0, highValue, 0, rgbHighValue);
+    B = map(z, 0, highValue, 0, rgbHighValue);
+    lightUpAllLights(pixels.Color(R, G, B), 0);
+    delay(100);
+
+    bendVal = analogRead(bendPin);
+    if(bendVal > bendThreshold){
+      colorSelected = true;
+    }
+  }
+  
+  int color[] = {R, G, B};
   sendMessage(color);
+
+  //Currently just selecting a colour based on a squeeze, further adjustments will come
 }
 
 // MARIE, put your code in this here function.
 // the client will need to be fixed as well before this works.
-void sendMessage(color) {
+void sendMessage(int color[]) {
   // your code
-  Serial.println(color);
+  while(true){
+    Serial.println(color[0]); //The red value of the colour, just to display it works
+    delay(5000); //Just so it won't go nuts
+  }
 }

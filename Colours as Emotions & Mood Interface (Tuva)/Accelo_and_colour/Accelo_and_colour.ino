@@ -1,8 +1,10 @@
 #include<Wire.h>
+#include "I2Cdev.h"
 #include <Adafruit_NeoPixel.h>
 
 const int LED_PIN = 14;
 const int NUMPIXELS = 8;
+const int flexPin = A1; //pin A0 to read analog input
 
 const int MPU=0x68; 
 int16_t AcX,AcY,AcZ,Tmp,GyX,GyY,GyZ;
@@ -50,13 +52,17 @@ void setup(){
   
 }
 void loop(){
+  //setup accelerometer;
   Wire.beginTransmission(MPU);
   Wire.write(0x3B);  
   Wire.endTransmission(false);
   Wire.requestFrom(MPU,12,true);  
   AcX=Wire.read()<<8|Wire.read();    
   AcY=Wire.read()<<8|Wire.read();  
-  AcZ=Wire.read()<<8|Wire.read();   
+  AcZ=Wire.read()<<8|Wire.read();  
+
+  //Setup bend sensor
+  flexValue = analogRead(flexPin); 
 
   X = 0;
   Y = 0;
@@ -114,9 +120,7 @@ void loop(){
       pixels.setPixelColor(i, pixels.Color(red, green, blue));
       pixels.show();
     }
-
-   
-
+    
     //resetting the shake
     haveBeenShaken = false;
     count = 0;
