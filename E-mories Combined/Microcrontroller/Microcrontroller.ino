@@ -18,10 +18,16 @@ bool vibrating = false;
 bool audioPlayed = false;
 bool lightsOn = false;
 bool messageReceived = false;
+bool isRecording = false;
 
 int bendVal = 0;
-int bendThreshold = 340; 
-//int bendThreshold = 3000; Values for Tuva
+// int bendThreshold = 340;
+
+// Values for Thomas
+int bendThreshold = 250; 
+
+// Values for Tuva
+//int bendThreshold = 3000; 
 
 int savingCounter = 0;
 
@@ -47,7 +53,6 @@ void setup() {
   mpu6050.calcGyroOffsets(true);
 }
 void loop() {
-  
   if(Serial.available()) {
     reset();
     messageReceived = true;
@@ -82,6 +87,7 @@ void loop() {
     }
   } else {
     if(bendVal < bendThreshold){
+      isRecording = true;
       Record();
     }
   }
@@ -144,14 +150,15 @@ void loop() {
 void Record(){
   lightsOn = false;
   Serial.println(1);
+  int recordingCounter = 0;
+  int minimumRecordTime = 3;
   
-  hapticPin = true;
-  
-  while(bendVal < bendThreshold) {
+  while(isRecording) {
     bendVal = analogRead(bendPin); //Read and save analog value from potentiometer
     digitalWrite(hapticPin, HIGH);
-    delay(40);
+    delay(60);
     digitalWrite(hapticPin, LOW);
+    Serial.println(bendVal);
 
     if(!lightsOn){
       lightUpAllLights(pixels.Color(255, 0, 0), 100); 
@@ -161,6 +168,11 @@ void Record(){
 
     lightsOn = !lightsOn;   
     delay(500);
+
+    if(recordingCounter > minimumRecordTime && bendVal < bendThreshold){
+      isRecording = false;
+    }
+    recordingCounter++;
   }
   lightUpAllLights(pixels.Color(0, 0, 0), 0);  
   StopRecord();
@@ -251,7 +263,7 @@ void selectColor() {
     delay(100);
 
     bendVal = analogRead(bendPin);
-    if(bendVal > bendThreshold){
+    if(bendVal < bendThreshold){
       colorSelected = true;
     }
   }
