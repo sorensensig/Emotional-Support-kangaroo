@@ -30,7 +30,7 @@ int bendThreshold = 250;
 //int bendThreshold = 3000; 
 
 // Values for Sigurd
-int bendThreshold = 420; 
+// int bendThreshold = 420; 
 
 int savingCounter = 0;
 
