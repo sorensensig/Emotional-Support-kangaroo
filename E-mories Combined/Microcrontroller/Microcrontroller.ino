@@ -32,6 +32,12 @@ int bendThreshold = 250;
 // Values for Sigurd
 // int bendThreshold = 420; 
 
+// Values for Marie
+int bendThreshold = 340;
+
+float throwThreshold = 2.70;
+float dropThreshold = 0.30;
+
 int savingCounter = 0;
 
 int redValue = 0;
@@ -49,7 +55,7 @@ void setup() {
   pinMode(hapticPin, OUTPUT);
   pinMode(bendPin, INPUT);
   lightUpAllLights(pixels.Color(0, 0, 0), 0);
-
+  
   //Accelerometer setup
   Wire.begin();
   mpu6050.begin();
@@ -60,6 +66,7 @@ void loop() {
   readIncomingMessage();
 
   bendVal = analogRead(bendPin);
+  //Serial.println(bendVal);
   
   if(messageReceived && bendVal < bendThreshold) {
     listenToMessage();
@@ -264,7 +271,7 @@ void selectColor() {
     x = mpu6050.getAngleX();
     y = mpu6050.getAngleY();
     z= mpu6050.getAngleZ();
-  
+    
     int highValue = 150;
     int rgbHighValue = 150;
     R = map(x, 0, highValue, 0, rgbHighValue);
@@ -290,7 +297,29 @@ void selectColor() {
 void sendMessage(int color[]) {
   // your code
   while(true){
-    Serial.println(color[0]); //The red value of the colour, just to display it works
-    delay(5000); //Just so it won't go nuts
+    mpu6050.update();
+    if(getTotalAcc() > throwThreshold){
+      //Ball thrown
+      sendData();
+    }else if(getTotalAcc() < dropThreshold){
+      //Ball dropped
+      reset();
+    }
   }
+}
+
+float getTotalAcc(){
+  float x = mpu6050.getAccX();
+  float y = mpu6050.getAccY();
+  float z = mpu6050.getAccZ();
+  return sqrt(x*x + y*y + z*z);
+}
+
+void sendData(){
+  Serial.println("Sending!");
+  delay(1000);
+  runHapticFeedback();
+  delay(100);
+  runHapticFeedback();
+  reset();
 }
