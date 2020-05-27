@@ -33,7 +33,7 @@ int bendThreshold = 250;
 // int bendThreshold = 420; 
 
 // Values for Marie
-int bendThreshold = 340;
+//int bendThreshold = 340;
 
 float throwThreshold = 2.70;
 float dropThreshold = 0.30;
@@ -317,7 +317,8 @@ float getTotalAcc(){
 }
 
 void sendData(int color[]){
-  Serial.println("message:" + color[0] + "," + color[1] + "," + color[2]);
+  String payload = "message:" + String(color[0]) + "," + String(color[1]) + "," + String(color[2]);
+  Serial.println(payload);
   delay(1000);
   runHapticFeedback();
   delay(100);
