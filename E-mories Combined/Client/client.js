@@ -38,7 +38,7 @@ if (!portNum) {
     
     if(line.includes("message:")){
       let delimiter = line.indexOf(":", 0);
-      colour = line.substring(delimiter, line.length-1);
+      colour = line.substring(delimiter+1, line.length-1);
     }
     
 
