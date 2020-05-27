@@ -31,12 +31,22 @@ if (!portNum) {
     parser.on('data', line => {
       // let recorder;
     let audio = "no work";
-  
+    let colour = "";
+    
+    if(line.includes("message:")){
+      let delimiter = line.indexOf(":", 0);
+      colour = input.substring(delimiter, line.length-1);
+    }
+    
+
+    let payload = {audio, colour};
+    socket.emit('audio', payload);
+
     //(async () => {
     //  recorder = await recordAudio();
     //})();
 
-    line = parseInt(line);
+    /*line = parseInt(line);
 
     switch(line){
       case 1:
@@ -58,7 +68,7 @@ if (!portNum) {
         socket.emit('audio', payload);
         console.log("Sent");
         break;
-      }
+      }*/
     });
     
     // Change the above switch statement with the code underneath when all prototypes are put together

@@ -66,7 +66,6 @@ void loop() {
   readIncomingMessage();
 
   bendVal = analogRead(bendPin);
-  //Serial.println(bendVal);
   
   if(messageReceived && bendVal < bendThreshold) {
     listenToMessage();
@@ -84,7 +83,6 @@ void loop() {
 
 void Record(){
   lightsOn = false;
-  Serial.println(1);
   int recordingCounter = 0;
   int minimumRecordTime = 3;
   
@@ -93,7 +91,6 @@ void Record(){
     digitalWrite(hapticPin, HIGH);
     delay(60);
     digitalWrite(hapticPin, LOW);
-    Serial.println(bendVal);
 
     if(!lightsOn){
       lightUpAllLights(pixels.Color(255, 0, 0), 100); 
@@ -296,14 +293,18 @@ void selectColor() {
 // the client will need to be fixed as well before this works.
 void sendMessage(int color[]) {
   // your code
-  while(true){
+  bool messageReady = true;
+
+  while(messageReady){
     mpu6050.update();
     if(getTotalAcc() > throwThreshold){
       //Ball thrown
-      sendData();
+      sendData(color);
+      messageReady = false;
     }else if(getTotalAcc() < dropThreshold){
       //Ball dropped
       reset();
+      messageReady = false;
     }
   }
 }
@@ -315,8 +316,8 @@ float getTotalAcc(){
   return sqrt(x*x + y*y + z*z);
 }
 
-void sendData(){
-  Serial.println("Sending!");
+void sendData(int color[]){
+  Serial.println("message:" + color[0] + "," + color[1] + "," + color[2]);
   delay(1000);
   runHapticFeedback();
   delay(100);
