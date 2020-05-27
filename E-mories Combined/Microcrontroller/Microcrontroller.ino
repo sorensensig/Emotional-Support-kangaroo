@@ -317,11 +317,11 @@ float getTotalAcc(){
 }
 
 void sendData(int color[]){
-  String payload = "message:" + String(color[0]) + "," + String(color[1]) + "," + String(color[2]);
-  Serial.println(payload);
   delay(1000);
   runHapticFeedback();
   delay(100);
   runHapticFeedback();
+  String payload = "message:" + String(color[0]) + "," + String(color[1]) + "," + String(color[2]);
+  Serial.println(payload);
   reset();
 }

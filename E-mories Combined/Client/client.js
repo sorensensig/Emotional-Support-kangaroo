@@ -4,8 +4,11 @@ const io = require('socket.io-client');
 const SerialPort = require('serialport');
 const Readline = require('@serialport/parser-readline');
 
-// const portNum = process.argv.slice(2)[0];
-const portNum = "/dev/cu.usbmodem14301";
+// Windows
+const portNum = 'COM5';
+
+// MAC OS
+//const portNum = "/dev/cu.usbmodem14301";
 
 if (!portNum) {
   console.log("Need USB port for arduino");
@@ -40,6 +43,7 @@ if (!portNum) {
     
 
     let payload = {audio, colour};
+    console.log(colour);
     socket.emit('audio', payload);
 
     //(async () => {
