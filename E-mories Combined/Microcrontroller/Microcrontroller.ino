@@ -24,13 +24,13 @@ int bendVal = 0;
 // int bendThreshold = 340;
 
 // Values for Thomas
-int bendThreshold = 250; 
+//int bendThreshold = 250; 
 
 // Values for Tuva
 //int bendThreshold = 3000; 
 
 // Values for Sigurd
-// int bendThreshold = 420; 
+ int bendThreshold = 420; 
 
 // Values for Marie
 //int bendThreshold = 340;
