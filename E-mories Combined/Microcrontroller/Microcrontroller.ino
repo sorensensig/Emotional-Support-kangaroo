@@ -21,16 +21,15 @@ bool messageReceived = false;
 bool isRecording = false;
 
 int bendVal = 0;
-// int bendThreshold = 340;
 
 // Values for Thomas
-//int bendThreshold = 250; 
+int bendThreshold = 80; 
 
 // Values for Tuva
 //int bendThreshold = 3000; 
 
 // Values for Sigurd
- int bendThreshold = 420; 
+//int bendThreshold = 420; 
 
 // Values for Marie
 //int bendThreshold = 340;
@@ -50,7 +49,7 @@ int arr[] = {redValue, greenValue, blueValue};
 
 void setup() {
   Serial.begin(115200);
-  //Serial.begin(9600); Value working for Tuva
+  //Serial.begin(9600); Value working for Tuva  
   pixels.begin();
   pinMode(hapticPin, OUTPUT);
   pinMode(bendPin, INPUT);
@@ -62,7 +61,6 @@ void setup() {
   mpu6050.calcGyroOffsets(true);
 }
 void loop() {
-  
   readIncomingMessage();
 
   bendVal = analogRead(bendPin);
