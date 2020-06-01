@@ -2,16 +2,17 @@
 #include <MPU6050_tockn.h>
 #include <Wire.h>
 
-#define PIXEL_PIN 6  // Digital IO pin connected to the NeoPixels.
-//#define PIXEL_PIN 14 //Tuva's Neopixel Pin
+//NeoPixel Setup
+//#define PIXEL_PIN 6 
+#define PIXEL_PIN 14 //Tuva's Neopixel Pin
 #define PIXEL_COUNT 8  // Number of NeoPixels
-
 Adafruit_NeoPixel pixels(PIXEL_COUNT, PIXEL_PIN, NEO_GRB + NEO_KHZ800);
 
 //Setup accelerometer with MPU library
 MPU6050 mpu6050(Wire);
 
-int hapticPin = 2;
+//int hapticPin = 2;
+int hapticPin = 33; //Value for Tuva
 int bendPin = A1;
 
 bool vibrating = false;
@@ -23,10 +24,10 @@ bool isRecording = false;
 int bendVal = 0;
 
 // Values for Thomas
-int bendThreshold = 80; 
+//int bendThreshold = 80; 
 
 // Values for Tuva
-//int bendThreshold = 3000; 
+int bendThreshold = 3000; 
 
 // Values for Sigurd
 //int bendThreshold = 420; 
@@ -48,11 +49,15 @@ int tempBlue = 0;
 int arr[] = {redValue, greenValue, blueValue};
 
 void setup() {
-  Serial.begin(115200);
-  //Serial.begin(9600); Value working for Tuva  
-  pixels.begin();
+  //Serial.begin(115200);
+  Serial.begin(9600); //Value working for Tuva  
+
+  //Vibration and flex sensor setup
   pinMode(hapticPin, OUTPUT);
   pinMode(bendPin, INPUT);
+
+  //NeoPixel setup
+  pixels.begin();
   lightUpAllLights(pixels.Color(0, 0, 0), 0);
   
   //Accelerometer setup
@@ -64,11 +69,23 @@ void loop() {
   readIncomingMessage();
 
   bendVal = analogRead(bendPin);
-  
-  if(messageReceived && bendVal < bendThreshold) {
+
+  //---------------------------------------------------------------
+  //CHANGE to this if value decreases when squeezed
+  //  if(messageReceived && bendVal < bendThreshold) {
+  //    listenToMessage();
+  //  } else {
+  //    if(bendVal < bendThreshold){
+  //      isRecording = true;
+  //      Record();
+  //    }
+  //  }
+  //------------------------------------------------------------------
+  //Working for Tuva
+  if(messageReceived && bendVal > bendThreshold) {
     listenToMessage();
   } else {
-    if(bendVal < bendThreshold){
+    if(bendVal > bendThreshold){
       isRecording = true;
       Record();
     }
@@ -98,8 +115,14 @@ void Record(){
 
     lightsOn = !lightsOn;   
     delay(500);
-
-    if(recordingCounter > minimumRecordTime && bendVal < bendThreshold){
+    //---------------------------------------------------------------
+    //CHANGE to this if value decreases when squeezed
+    //    if(recordingCounter > minimumRecordTime && bendVal < bendThreshold){
+    //      isRecording = false;
+    //    }
+    //----------------------------------------------------------------------------
+    //Working for Tuva
+    if(recordingCounter > minimumRecordTime && bendVal > bendThreshold){
       isRecording = false;
     }
     recordingCounter++;
@@ -258,37 +281,49 @@ void reset() {
 void selectColor() {
   bool colorSelected = false;
   int R, G, B;
-  
   while(!colorSelected){
     mpu6050.update();
     float x, y, z;
   
-    x = mpu6050.getAngleX();
-    y = mpu6050.getAngleY();
-    z= mpu6050.getAngleZ();
-    
-    int highValue = 150;
-    int rgbHighValue = 150;
-    R = map(x, 0, highValue, 0, rgbHighValue);
-    G = map(y, 0, highValue, 0, rgbHighValue);
-    B = map(z, 0, highValue, 0, rgbHighValue);
-    lightUpAllLights(pixels.Color(R, G, B), 0);
-    delay(100);
+    x = limitValue(mpu6050.getAngleX());
+    y = limitValue(mpu6050.getAngleY());
+    z= limitValue(mpu6050.getAngleZ());
 
+    int lowValue = 0;
+    int highValue = 360;
+    int rgbHighValue = 200;
+    //restrict the value to be withoin + and 360
+    R = map(abs(x), lowValue, highValue, 0, rgbHighValue);
+    G = map(abs(y), lowValue, highValue, 0, rgbHighValue);
+    B = map(abs(z), lowValue, highValue, 0, rgbHighValue);
+    
+    lightUpAllLights(pixels.Color(R, G, B), 0);
     bendVal = analogRead(bendPin);
-    if(bendVal < bendThreshold){
+    //-----------------------------------------------------
+    //Working for Tuva
+    if(bendVal > bendThreshold){ 
       colorSelected = true;
     }
+
+    //-----------------------------------------------------
+    //CHANGE to this if value decreases when squeezed
+    //if(bendVal < bendThreshold){ 
+    //  colorSelected = true;
+    //}
+    
+    delay(100);
+
+    
   }
-  
+  if (colorSelected){
+    vibrate(); 
+    adjustColor(R, G, B);
+  }
   int color[] = {R, G, B};
   sendMessage(color);
-
-  //Currently just selecting a colour based on a squeeze, further adjustments will come
 }
 
-// MARIE, put your code in this here function.
-// the client will need to be fixed as well before this works.
+// MARIEs function
 void sendMessage(int color[]) {
   // your code
   bool messageReady = true;
@@ -305,6 +340,71 @@ void sendMessage(int color[]) {
       messageReady = false;
     }
   }
+}
+
+void adjustColor (int & R, int & G, int & B){
+  int newR, newG, newB;
+  bool colorAdjusted = false;
+  float x, y, z;
+
+  while(!colorAdjusted){
+    mpu6050.update();
+    x = limitValue(mpu6050.getAngleX());
+    y = limitValue(mpu6050.getAngleY());
+    z= limitValue(mpu6050.getAngleZ());
+    
+    int totalMovement = ((x + y + z) / 3)* 10; //Gets the average movement
+    int totalValue = map(totalMovement, -360, 360, 1, 19);
+    float precentage = totalValue / 10.0;
+    newR = limitRGBvalue(R*precentage);
+    newG = limitRGBvalue(G*precentage);
+    newB = limitRGBvalue(B*precentage);
+    lightUpAllLights(pixels.Color(newR, newG, newB), 0);
+    delay(100);
+
+    bendVal = analogRead(bendPin);
+    //-----------------------------------------------------
+    //Working for Tuva
+    if(bendVal > bendThreshold){ 
+      colorAdjusted = true;
+    }
+
+    //-----------------------------------------------------
+    //CHANGE to this if value decreases when squeezed
+    //if(bendVal < bendThreshold){ 
+    //  colorAdjusted = true;
+    //}
+  }
+  if (colorAdjusted){
+    vibrate(); 
+    R = newR;
+    G = newG;
+    B = newB;
+  }
+}
+
+void vibrate (){
+  digitalWrite(hapticPin, HIGH);
+  delay(400);
+  digitalWrite(hapticPin, LOW); 
+}
+
+
+int limitValue (int value){
+  int valueRestriction = 360;
+  if(value > 360){
+    return limitValue(value-720);
+  }
+  else if (value < -360){
+    return limitValue(value + 720);
+  }
+  else {
+    return value;
+  }
+}
+
+int limitRGBvalue(int value){
+  return constrain(value, 10, 255); //Restrcit from not going to 0
 }
 
 float getTotalAcc(){
