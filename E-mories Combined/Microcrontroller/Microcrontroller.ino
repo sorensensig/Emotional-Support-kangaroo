@@ -35,7 +35,8 @@ int bendThreshold = 3000;
 // Values for Marie
 //int bendThreshold = 340;
 
-float throwThreshold = 2.70;
+//float throwThreshold = 2.70;
+float throwThreshold = 2.00; //Works for Tuva
 float dropThreshold = 0.30;
 
 int savingCounter = 0;
@@ -410,7 +411,7 @@ int limitRGBvalue(int value){
 float getTotalAcc(){
   float x = mpu6050.getAccX();
   float y = mpu6050.getAccY();
-  float z = mpu6050.getAccZ();
+  float z = mpu6050.getAccZ(); 
   return sqrt(x*x + y*y + z*z);
 }
 
