@@ -21,8 +21,8 @@ Adafruit_NeoPixel pixels(PIXEL_COUNT, PIXEL_PIN, NEO_GRB + NEO_KHZ800);
 //Setup accelerometer with MPU library
 MPU6050 mpu6050(Wire);
 
-int hapticPin = 2;
-//int hapticPin = 33; //Value for Tuva
+//int hapticPin = 2;
+int hapticPin = 33; //Value for Tuva
 int bendPin = A1;
 
 bool vibrating = false;
@@ -75,19 +75,13 @@ void setup() {
   pinMode(bendPin, INPUT);
 
   //NeoPixel setup
-  
-  Serial.println("set pixels");
   pixels.begin();
   lightUpAllLights(pixels.Color(0, 0, 0), 0);
   
   //Accelerometer setup
-  
-  Serial.println("Wire begin");
   Wire.begin();
   mpu6050.begin();
   mpu6050.calcGyroOffsets(true);
-  
-  Serial.println("setup finished");
 }
 void loop() {
   readIncomingMessage();
@@ -317,17 +311,75 @@ void selectColor() {
 
     int lowValue = 0;
     int highValue = 360;
-    // for Thomas
-    int rgbHighValue = 255;
-
-    // for rest
-    //int rgbHighValue = 200;
+    int rgbHighValue = 200;
     //restrict the value to be withoin + and 360
     R = map(abs(x), lowValue, highValue, 0, rgbHighValue);
     G = map(abs(y), lowValue, highValue, 0, rgbHighValue);
     B = map(abs(z), lowValue, highValue, 0, rgbHighValue);
     
     lightUpAllLights(pixels.Color(R, G, B), 0);
+    bendVal = analogRead(bendPin);
+
+    if(user == "Tuva") {
+      // Working for Tuva
+      if(bendVal > bendThreshold){ 
+        colorSelected = true;
+      }
+    } else {
+      if(bendVal < bendThreshold){ 
+        colorSelected = true;
+      }
+    }
+    delay(100);
+
+  }
+  if (colorSelected){
+    vibrate(); 
+    adjustColor(R, G, B);
+  }
+  int color[] = {R, G, B};
+  sendMessage(color);
+}
+
+// MARIEs function
+void sendMessage(int color[]) {
+  // your code
+  bool messageReady = true;
+
+  while(messageReady){
+    mpu6050.update();
+    if(getTotalAcc() > throwThreshold){
+      //Ball thrown
+      sendData(color);
+      messageReady = false;
+    }else if(getTotalAcc() < dropThreshold){
+      //Ball dropped
+      reset();
+      messageReady = false;
+    }
+  }
+}
+
+void adjustColor (int & R, int & G, int & B){
+  int newR, newG, newB;
+  bool colorAdjusted = false;
+  float x, y, z;
+
+  while(!colorAdjusted){
+    mpu6050.update();
+    x = limitValue(mpu6050.getAngleX());
+    y = limitValue(mpu6050.getAngleY());
+    z= limitValue(mpu6050.getAngleZ());
+    
+    int totalMovement = ((x + y + z) / 3)* 10; //Gets the average movement
+    int totalValue = map(totalMovement, -360, 360, 1, 19);
+    float precentage = totalValue / 10.0;
+    newR = limitRGBvalue(R*precentage);
+    newG = limitRGBvalue(G*precentage);
+    newB = limitRGBvalue(B*precentage);
+    lightUpAllLights(pixels.Color(newR, newG, newB), 0);
+    delay(100);
+
     bendVal = analogRead(bendPin);
 
     if(user == "Tuva") {
@@ -339,6 +391,7 @@ void selectColor() {
       if(bendVal < bendThreshold){ 
         colorAdjusted = true;
       }
+    }
   }
   if (colorAdjusted){
     vibrate(); 
