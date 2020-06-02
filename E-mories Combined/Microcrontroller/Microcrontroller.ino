@@ -7,20 +7,20 @@
 // Tuva = 2
 // Marie = 3
 // Thomas = 4
-int user = 1;
+int user = 4;
 // FILL IN YOUR NUMBER HERE
 
 // EVERYONE ELSE'S SETTINGS
 //NeoPixel Setup
-//#define PIXEL_PIN 6
-//int hapticPin = 2;
+#define PIXEL_PIN 6
+int hapticPin = 2;
 
-// TUVA'S PIXEL SETTINGS
-#define PIXEL_PIN 14 //Tuva's Neopixel Pin
+// TUVA'S SETTINGS
+//#define PIXEL_PIN 14 //Tuva's Neopixel Pin
+//int hapticPin = 33; //Value for Tuva
+
+
 #define PIXEL_COUNT 8  // Number of NeoPixels
-int hapticPin = 33; //Value for Tuva
-
-
 
 // COMMON SETTINGS
 Adafruit_NeoPixel pixels(PIXEL_COUNT, PIXEL_PIN, NEO_GRB + NEO_KHZ800);
@@ -29,10 +29,6 @@ Adafruit_NeoPixel pixels(PIXEL_COUNT, PIXEL_PIN, NEO_GRB + NEO_KHZ800);
 MPU6050 mpu6050(Wire);
 
 int bendPin = A1;
-
-// FILL IN YOUR NAME HERE
-string user = "Sigurd";
-// FILL IN YOUR NAME HERE
 
 bool vibrating = false;
 bool audioPlayed = false;
