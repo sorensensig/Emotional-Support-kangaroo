@@ -2,28 +2,22 @@
 #include <MPU6050_tockn.h>
 #include <Wire.h>
 
-// FILL IN YOUR NAME HERE
-string user = "Sigurd";
-// FILL IN YOUR NAME HERE
-
-// EVERYONE ELSE'S SETTINGS
 //NeoPixel Setup
-//#define PIXEL_PIN 6
-
-// TUVA'S PIXEL SETTINGS
+//#define PIXEL_PIN 6 
 #define PIXEL_PIN 14 //Tuva's Neopixel Pin
 #define PIXEL_COUNT 8  // Number of NeoPixels
-
-
-
-// COMMON SETTINGS
 Adafruit_NeoPixel pixels(PIXEL_COUNT, PIXEL_PIN, NEO_GRB + NEO_KHZ800);
+
 //Setup accelerometer with MPU library
 MPU6050 mpu6050(Wire);
 
 //int hapticPin = 2;
 int hapticPin = 33; //Value for Tuva
 int bendPin = A1;
+
+// FILL IN YOUR NAME HERE
+string user = "Sigurd";
+// FILL IN YOUR NAME HERE
 
 bool vibrating = false;
 bool audioPlayed = false;
@@ -47,23 +41,23 @@ int tempGreen = 0;
 int tempBlue = 0;
 int arr[] = {redValue, greenValue, blueValue};
 
-void setup() {
-  switch(user) {
-    case "Sigurd":
-      bendThreshold = 420;
-      break;
-    case "Tuva":
-      bendThreshold = 3000;
-      throwThreshold = 2.00;
-      break;
-    case "Marie":
-      bendThreshold = 340;
-      break;
-    case "Thomas":
-      bendThreshold = 80;
-      break;
-  }
+switch(user) {
+  case "Sigurd":
+    bendThreshold = 420;
+    break;
+  case "Tuva":
+    bendThreshold = 3000;
+    throwThreshold = 2.00;
+    break;
+  case "Marie":
+    bendThreshold = 340;
+    break;
+  case "Thomas":
+    bendThreshold = 80;
+    break;
+}
 
+void setup() {
   if(user == "Tuva") {
     Serial.begin(9600); //Value working for Tuva 
   } else {
