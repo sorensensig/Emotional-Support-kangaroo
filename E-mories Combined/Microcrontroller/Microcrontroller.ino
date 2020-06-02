@@ -2,17 +2,23 @@
 #include <MPU6050_tockn.h>
 #include <Wire.h>
 
-// FILL IN YOUR NAME HERE
-string user = "Sigurd";
-// FILL IN YOUR NAME HERE
+// FILL IN YOUR NUMBER HERE
+// Sigurd = 1
+// Tuva = 2
+// Marie = 3
+// Thomas = 4
+int user = 1;
+// FILL IN YOUR NUMBER HERE
 
 // EVERYONE ELSE'S SETTINGS
 //NeoPixel Setup
 //#define PIXEL_PIN 6
+//int hapticPin = 2;
 
 // TUVA'S PIXEL SETTINGS
 #define PIXEL_PIN 14 //Tuva's Neopixel Pin
 #define PIXEL_COUNT 8  // Number of NeoPixels
+int hapticPin = 33; //Value for Tuva
 
 
 
@@ -21,8 +27,6 @@ Adafruit_NeoPixel pixels(PIXEL_COUNT, PIXEL_PIN, NEO_GRB + NEO_KHZ800);
 //Setup accelerometer with MPU library
 MPU6050 mpu6050(Wire);
 
-//int hapticPin = 2;
-int hapticPin = 33; //Value for Tuva
 int bendPin = A1;
 
 bool vibrating = false;
@@ -49,22 +53,22 @@ int arr[] = {redValue, greenValue, blueValue};
 
 void setup() {
   switch(user) {
-    case "Sigurd":
+    case 1:
       bendThreshold = 420;
       break;
-    case "Tuva":
+    case 2:
       bendThreshold = 3000;
       throwThreshold = 2.00;
       break;
-    case "Marie":
+    case 3:
       bendThreshold = 340;
       break;
-    case "Thomas":
+    case 4:
       bendThreshold = 80;
       break;
   }
 
-  if(user == "Tuva") {
+  if(user == 2) {
     Serial.begin(9600); //Value working for Tuva 
   } else {
     Serial.begin(115200);
@@ -88,7 +92,7 @@ void loop() {
 
   bendVal = analogRead(bendPin);
 
-  if(user == "Tuva") {
+  if(user == 2) {
     // Working for Tuva
     if(messageReceived && bendVal > bendThreshold) {
       listenToMessage();
@@ -134,7 +138,7 @@ void Record(){
     lightsOn = !lightsOn;   
     delay(500);
 
-    if(user == "Tuva") {
+    if(user == 2) {
       //Working for Tuva
       if(recordingCounter > minimumRecordTime && bendVal > bendThreshold){
         isRecording = false;
@@ -176,13 +180,11 @@ void StopRecord(){
   lightUpAllLights(pixels.Color(0, 255, 0), 50);  
   delay(500);
   lightUpAllLights(pixels.Color(0, 0, 0), 50);  
-
-  
   selectColor();
 }
 
 void readIncomingMessage() {
-    if(Serial.available()) {
+  if(Serial.available()) {
     reset();
     messageReceived = true;
     audioPlayed = false;
@@ -320,7 +322,7 @@ void selectColor() {
     lightUpAllLights(pixels.Color(R, G, B), 0);
     bendVal = analogRead(bendPin);
 
-    if(user == "Tuva") {
+    if(user == 2) {
       // Working for Tuva
       if(bendVal > bendThreshold){ 
         colorSelected = true;
@@ -382,7 +384,7 @@ void adjustColor (int & R, int & G, int & B){
 
     bendVal = analogRead(bendPin);
 
-    if(user == "Tuva") {
+    if(user == 2) {
       //Working for Tuva
       if(bendVal > bendThreshold){ 
         colorAdjusted = true;
