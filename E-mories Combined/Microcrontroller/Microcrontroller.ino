@@ -15,6 +15,10 @@ int hapticPin = 2;
 //int hapticPin = 33; //Value for Tuva
 int bendPin = A1;
 
+// FILL IN YOUR NAME HERE
+string user = "Sigurd";
+// FILL IN YOUR NAME HERE
+
 bool vibrating = false;
 bool audioPlayed = false;
 bool lightsOn = false;
@@ -22,22 +26,10 @@ bool messageReceived = false;
 bool isRecording = false;
 
 int bendVal = 0;
+int bendThreshold;
 
-// Values for Thomas
-int bendThreshold = 80; 
-
-// Values for Tuva
-//int bendThreshold = 3000; 
-
-// Values for Sigurd
-//int bendThreshold = 420; 
-
-// Values for Marie
-//int bendThreshold = 340;
-
-//float throwThreshold = 2.70;
-float throwThreshold = 2.00; //Works for Tuva
 float dropThreshold = 0.30;
+float throwThreshold = 2.70;
 
 int savingCounter = 0;
 
@@ -49,10 +41,28 @@ int tempGreen = 0;
 int tempBlue = 0;
 int arr[] = {redValue, greenValue, blueValue};
 
+switch(user) {
+  case "Sigurd":
+    bendThreshold = 420;
+    break;
+  case "Tuva":
+    bendThreshold = 3000;
+    throwThreshold = 2.00;
+    break;
+  case "Marie":
+    bendThreshold = 340;
+    break;
+  case "Thomas":
+    bendThreshold = 80;
+    break;
+}
+
 void setup() {
-  Serial.println("start");
-  Serial.begin(115200);
-  //Serial.begin(9600); //Value working for Tuva  
+  if(user == "Tuva") {
+    Serial.begin(9600); //Value working for Tuva 
+  } else {
+    Serial.begin(115200);
+  }
 
   //Vibration and flex sensor setup
   pinMode(hapticPin, OUTPUT);
@@ -78,26 +88,26 @@ void loop() {
 
   bendVal = analogRead(bendPin);
 
-  //---------------------------------------------------------------
-  //CHANGE to this if value decreases when squeezed
-    if(messageReceived && bendVal < bendThreshold) {
+  if(user == "Tuva") {
+    // Working for Tuva
+    if(messageReceived && bendVal > bendThreshold) {
       listenToMessage();
     } else {
-      if(bendVal < bendThreshold){
+      if(bendVal > bendThreshold){
         isRecording = true;
         Record();
       }
     }
-  //------------------------------------------------------------------
-  //Working for Tuva
-  // if(messageReceived && bendVal > bendThreshold) {
-  //  listenToMessage();
-  //} else {
-  //  if(bendVal > bendThreshold){
-  //    isRecording = true;
-  //    Record();
-  //  }
-  //}
+  } else {
+   if(messageReceived && bendVal < bendThreshold) {
+     listenToMessage();
+   } else {
+     if(bendVal < bendThreshold){
+       isRecording = true;
+       Record();
+     }
+   }
+  }
   
   if(!(arr[0] == 0 && arr[1] == 0 && arr[2] == 0) && !audioPlayed) {
     pulsateLights();
@@ -110,7 +120,7 @@ void Record(){
   int minimumRecordTime = 3;
   
   while(isRecording) {
-    bendVal = analogRead(bendPin); //Read and save analog value from potentiometer
+    bendVal = analogRead(bendPin); //Read and save analog value from bend sensor
     digitalWrite(hapticPin, HIGH);
     delay(60);
     digitalWrite(hapticPin, LOW);
@@ -123,16 +133,18 @@ void Record(){
 
     lightsOn = !lightsOn;   
     delay(500);
-    //---------------------------------------------------------------
-    //CHANGE to this if value decreases when squeezed
-        if(recordingCounter > minimumRecordTime && bendVal < bendThreshold){
-          isRecording = false;
-        }
-    //----------------------------------------------------------------------------
-    //Working for Tuva
-    //if(recordingCounter > minimumRecordTime && bendVal > bendThreshold){
-    //  isRecording = false;
-    //}
+
+    if(user == "Tuva") {
+      //Working for Tuva
+      if(recordingCounter > minimumRecordTime && bendVal > bendThreshold){
+        isRecording = false;
+      }
+    } else {
+      if(recordingCounter > minimumRecordTime && bendVal < bendThreshold){
+        isRecording = false;
+      }
+    }
+
     recordingCounter++;
   }
   lightUpAllLights(pixels.Color(0, 0, 0), 0);  
@@ -311,81 +323,16 @@ void selectColor() {
     
     lightUpAllLights(pixels.Color(R, G, B), 0);
     bendVal = analogRead(bendPin);
-    //-----------------------------------------------------
-    //Working for Tuva
-    //if(bendVal > bendThreshold){ 
-    //  colorSelected = true;
-    //}
 
-    //-----------------------------------------------------
-    //CHANGE to this if value decreases when squeezed
-    if(bendVal < bendThreshold){ 
-      colorSelected = true;
-    }
-    
-    delay(100);
-
-    
-  }
-  if (colorSelected){
-    vibrate(); 
-    adjustColor(R, G, B);
-  }
-  int color[] = {R, G, B};
-  sendMessage(color);
-}
-
-// MARIEs function
-void sendMessage(int color[]) {
-  // your code
-  bool messageReady = true;
-
-  while(messageReady){
-    mpu6050.update();
-    if(getTotalAcc() > throwThreshold){
-      //Ball thrown
-      sendData(color);
-      messageReady = false;
-    }else if(getTotalAcc() < dropThreshold){
-      //Ball dropped
-      reset();
-      messageReady = false;
-    }
-  }
-}
-
-void adjustColor (int & R, int & G, int & B){
-  int newR, newG, newB;
-  bool colorAdjusted = false;
-  float x, y, z;
-
-  while(!colorAdjusted){
-    mpu6050.update();
-    x = limitValue(mpu6050.getAngleX());
-    y = limitValue(mpu6050.getAngleY());
-    z= limitValue(mpu6050.getAngleZ());
-    
-    int totalMovement = ((x + y + z) / 3)* 10; //Gets the average movement
-    int totalValue = map(totalMovement, -360, 360, 1, 19);
-    float precentage = totalValue / 10.0;
-    newR = limitRGBvalue(R*precentage);
-    newG = limitRGBvalue(G*precentage);
-    newB = limitRGBvalue(B*precentage);
-    lightUpAllLights(pixels.Color(newR, newG, newB), 0);
-    delay(100);
-
-    bendVal = analogRead(bendPin);
-    //-----------------------------------------------------
-    //Working for Tuva
-    //if(bendVal > bendThreshold){ 
-    //  colorAdjusted = true;
-    //}
-
-    //-----------------------------------------------------
-    //CHANGE to this if value decreases when squeezed
-    if(bendVal < bendThreshold){ 
-      colorAdjusted = true;
-    }
+    if(user == "Tuva") {
+      //Working for Tuva
+      if(bendVal > bendThreshold){ 
+        colorAdjusted = true;
+      }
+    } else {
+      if(bendVal < bendThreshold){ 
+        colorAdjusted = true;
+      }
   }
   if (colorAdjusted){
     vibrate(); 
