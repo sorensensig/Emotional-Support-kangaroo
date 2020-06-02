@@ -9,12 +9,10 @@ string user = "Sigurd";
 // EVERYONE ELSE'S SETTINGS
 //NeoPixel Setup
 //#define PIXEL_PIN 6
-int hapticPin = 2;
 
 // TUVA'S PIXEL SETTINGS
 #define PIXEL_PIN 14 //Tuva's Neopixel Pin
 #define PIXEL_COUNT 8  // Number of NeoPixels
-//int hapticPin = 33; //Value for Tuva
 
 
 
@@ -23,6 +21,8 @@ Adafruit_NeoPixel pixels(PIXEL_COUNT, PIXEL_PIN, NEO_GRB + NEO_KHZ800);
 //Setup accelerometer with MPU library
 MPU6050 mpu6050(Wire);
 
+int hapticPin = 2;
+//int hapticPin = 33; //Value for Tuva
 int bendPin = A1;
 
 bool vibrating = false;
