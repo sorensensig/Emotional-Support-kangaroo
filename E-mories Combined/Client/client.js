@@ -35,7 +35,7 @@ if (!portNum) {
       // let recorder;
     let audio = "no work";
     let colour = "";
-    
+    console.log(line);
     if(line.includes("message:")){
       let delimiter = line.indexOf(":", 0);
       colour = line.substring(delimiter+1, line.length-1);
@@ -43,7 +43,6 @@ if (!portNum) {
     
 
     let payload = {audio, colour};
-    console.log(colour);
     socket.emit('audio', payload);
 
     //(async () => {
@@ -80,6 +79,7 @@ if (!portNum) {
 
     socket.on('audio', payload => {
       let arr = covertRGB(payload.colour);
+      console.log(arr);
       port.write(arr);
     });
 
