@@ -24,10 +24,15 @@ int hapticPin = 33; //Value for Tuva
 
 // COMMON SETTINGS
 Adafruit_NeoPixel pixels(PIXEL_COUNT, PIXEL_PIN, NEO_GRB + NEO_KHZ800);
+
 //Setup accelerometer with MPU library
 MPU6050 mpu6050(Wire);
 
 int bendPin = A1;
+
+// FILL IN YOUR NAME HERE
+string user = "Sigurd";
+// FILL IN YOUR NAME HERE
 
 bool vibrating = false;
 bool audioPlayed = false;
