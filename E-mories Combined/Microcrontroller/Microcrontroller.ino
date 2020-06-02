@@ -3,16 +3,16 @@
 #include <Wire.h>
 
 //NeoPixel Setup
-//#define PIXEL_PIN 6 
-#define PIXEL_PIN 14 //Tuva's Neopixel Pin
+#define PIXEL_PIN 6 
+//#define PIXEL_PIN 14 //Tuva's Neopixel Pin
 #define PIXEL_COUNT 8  // Number of NeoPixels
 Adafruit_NeoPixel pixels(PIXEL_COUNT, PIXEL_PIN, NEO_GRB + NEO_KHZ800);
 
 //Setup accelerometer with MPU library
 MPU6050 mpu6050(Wire);
 
-//int hapticPin = 2;
-int hapticPin = 33; //Value for Tuva
+int hapticPin = 2;
+//int hapticPin = 33; //Value for Tuva
 int bendPin = A1;
 
 bool vibrating = false;
@@ -24,10 +24,10 @@ bool isRecording = false;
 int bendVal = 0;
 
 // Values for Thomas
-//int bendThreshold = 80; 
+int bendThreshold = 80; 
 
 // Values for Tuva
-int bendThreshold = 3000; 
+//int bendThreshold = 3000; 
 
 // Values for Sigurd
 //int bendThreshold = 420; 
@@ -50,21 +50,28 @@ int tempBlue = 0;
 int arr[] = {redValue, greenValue, blueValue};
 
 void setup() {
-  //Serial.begin(115200);
-  Serial.begin(9600); //Value working for Tuva  
+  Serial.println("start");
+  Serial.begin(115200);
+  //Serial.begin(9600); //Value working for Tuva  
 
   //Vibration and flex sensor setup
   pinMode(hapticPin, OUTPUT);
   pinMode(bendPin, INPUT);
 
   //NeoPixel setup
+  
+  Serial.println("set pixels");
   pixels.begin();
   lightUpAllLights(pixels.Color(0, 0, 0), 0);
   
   //Accelerometer setup
+  
+  Serial.println("Wire begin");
   Wire.begin();
   mpu6050.begin();
   mpu6050.calcGyroOffsets(true);
+  
+  Serial.println("setup finished");
 }
 void loop() {
   readIncomingMessage();
@@ -73,24 +80,24 @@ void loop() {
 
   //---------------------------------------------------------------
   //CHANGE to this if value decreases when squeezed
-  //  if(messageReceived && bendVal < bendThreshold) {
-  //    listenToMessage();
-  //  } else {
-  //    if(bendVal < bendThreshold){
-  //      isRecording = true;
-  //      Record();
-  //    }
-  //  }
+    if(messageReceived && bendVal < bendThreshold) {
+      listenToMessage();
+    } else {
+      if(bendVal < bendThreshold){
+        isRecording = true;
+        Record();
+      }
+    }
   //------------------------------------------------------------------
   //Working for Tuva
-  if(messageReceived && bendVal > bendThreshold) {
-    listenToMessage();
-  } else {
-    if(bendVal > bendThreshold){
-      isRecording = true;
-      Record();
-    }
-  }
+  // if(messageReceived && bendVal > bendThreshold) {
+  //  listenToMessage();
+  //} else {
+  //  if(bendVal > bendThreshold){
+  //    isRecording = true;
+  //    Record();
+  //  }
+  //}
   
   if(!(arr[0] == 0 && arr[1] == 0 && arr[2] == 0) && !audioPlayed) {
     pulsateLights();
@@ -118,14 +125,14 @@ void Record(){
     delay(500);
     //---------------------------------------------------------------
     //CHANGE to this if value decreases when squeezed
-    //    if(recordingCounter > minimumRecordTime && bendVal < bendThreshold){
-    //      isRecording = false;
-    //    }
+        if(recordingCounter > minimumRecordTime && bendVal < bendThreshold){
+          isRecording = false;
+        }
     //----------------------------------------------------------------------------
     //Working for Tuva
-    if(recordingCounter > minimumRecordTime && bendVal > bendThreshold){
-      isRecording = false;
-    }
+    //if(recordingCounter > minimumRecordTime && bendVal > bendThreshold){
+    //  isRecording = false;
+    //}
     recordingCounter++;
   }
   lightUpAllLights(pixels.Color(0, 0, 0), 0);  
@@ -292,7 +299,11 @@ void selectColor() {
 
     int lowValue = 0;
     int highValue = 360;
-    int rgbHighValue = 200;
+    // for Thomas
+    int rgbHighValue = 255;
+
+    // for rest
+    //int rgbHighValue = 200;
     //restrict the value to be withoin + and 360
     R = map(abs(x), lowValue, highValue, 0, rgbHighValue);
     G = map(abs(y), lowValue, highValue, 0, rgbHighValue);
@@ -302,15 +313,15 @@ void selectColor() {
     bendVal = analogRead(bendPin);
     //-----------------------------------------------------
     //Working for Tuva
-    if(bendVal > bendThreshold){ 
-      colorSelected = true;
-    }
+    //if(bendVal > bendThreshold){ 
+    //  colorSelected = true;
+    //}
 
     //-----------------------------------------------------
     //CHANGE to this if value decreases when squeezed
-    //if(bendVal < bendThreshold){ 
-    //  colorSelected = true;
-    //}
+    if(bendVal < bendThreshold){ 
+      colorSelected = true;
+    }
     
     delay(100);
 
@@ -366,15 +377,15 @@ void adjustColor (int & R, int & G, int & B){
     bendVal = analogRead(bendPin);
     //-----------------------------------------------------
     //Working for Tuva
-    if(bendVal > bendThreshold){ 
-      colorAdjusted = true;
-    }
+    //if(bendVal > bendThreshold){ 
+    //  colorAdjusted = true;
+    //}
 
     //-----------------------------------------------------
     //CHANGE to this if value decreases when squeezed
-    //if(bendVal < bendThreshold){ 
-    //  colorAdjusted = true;
-    //}
+    if(bendVal < bendThreshold){ 
+      colorAdjusted = true;
+    }
   }
   if (colorAdjusted){
     vibrate(); 
