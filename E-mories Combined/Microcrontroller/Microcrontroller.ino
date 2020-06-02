@@ -193,7 +193,9 @@ void readIncomingMessage() {
     for(int i = 0; i < 3; i++) {
       arr[i] = Serial.read();
     }
-  
+
+    Serial.println(arr[1]);
+    
     redValue = arr[0];
     greenValue = arr[1];
     blueValue = arr[2];
@@ -441,6 +443,7 @@ void sendData(int color[]){
   delay(100);
   runHapticFeedback();
   String payload = "message:" + String(color[0]) + "," + String(color[1]) + "," + String(color[2]);
+  Serial.println();
   Serial.println(payload);
   reset();
 }
