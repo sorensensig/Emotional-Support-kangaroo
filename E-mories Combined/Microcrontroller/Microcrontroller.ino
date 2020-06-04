@@ -7,17 +7,17 @@
 // Tuva = 2
 // Marie = 3
 // Thomas = 4
-int user = 2;
+int user = 3;
 // FILL IN YOUR NUMBER HERE
 
 // EVERYONE ELSE'S SETTINGS
 //NeoPixel Setup
-//#define PIXEL_PIN 6
-//int hapticPin = 2;
+#define PIXEL_PIN 6
+int hapticPin = 2;
 
 // TUVA'S SETTINGS
-#define PIXEL_PIN 14 //Tuva's Neopixel Pin
-int hapticPin = 33; //Value for Tuva
+//#define PIXEL_PIN 14 //Tuva's Neopixel Pin
+//int hapticPin = 33; //Value for Tuva
 
 
 #define PIXEL_COUNT 8  // Number of NeoPixels
@@ -40,7 +40,7 @@ int bendVal = 0;
 int bendThreshold;
 
 float dropThreshold = 0.30;
-float throwThreshold = 2.70;
+float throwThreshold = 1.50;
 
 int savingCounter = 0;
 
@@ -318,19 +318,38 @@ void selectColor() {
 void sendMessage(int color[]) {
   // your code
   bool messageReady = true;
-
+  float acc;
   while(messageReady){
     mpu6050.update();
-    if(getTotalAcc() > throwThreshold){
-      //Ball thrown
-      sendData(color);
-      messageReady = false;
-    }else if(getTotalAcc() < dropThreshold){
-      //Ball dropped
-      reset();
-      messageReady = false;
+    acc = getTotalAcc();
+    if( acc > throwThreshold){
+      messageReady = dropThrow(false, color);
+    }else if(acc < dropThreshold){
+      messageReady = dropThrow(true, color);
     }
   }
+}
+
+bool dropThrow(bool drop, int color[]){
+  long t = millis();
+  while(millis() - t <  500){
+    mpu6050.update();
+    float acc = getTotalAcc();
+    if(drop){
+      if(acc > throwThreshold){
+        //Ball dropped
+        reset();
+        return false;
+      }
+    }else{
+      if(acc < dropThreshold){
+        //Ball thrown
+        sendData(color);
+        return false;
+      } 
+    }
+  }
+  return true; 
 }
 
 void adjustColor (int & R, int & G, int & B){
