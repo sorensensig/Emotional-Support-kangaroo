@@ -7,17 +7,17 @@
 // Tuva = 2
 // Marie = 3
 // Thomas = 4
-int user = 4;
+int user = 2;
 // FILL IN YOUR NUMBER HERE
 
 // EVERYONE ELSE'S SETTINGS
 //NeoPixel Setup
-#define PIXEL_PIN 6
-int hapticPin = 2;
+//#define PIXEL_PIN 6
+//int hapticPin = 2;
 
 // TUVA'S SETTINGS
-//#define PIXEL_PIN 14 //Tuva's Neopixel Pin
-//int hapticPin = 33; //Value for Tuva
+#define PIXEL_PIN 14 //Tuva's Neopixel Pin
+int hapticPin = 33; //Value for Tuva
 
 
 #define PIXEL_COUNT 8  // Number of NeoPixels
@@ -58,7 +58,7 @@ void setup() {
       bendThreshold = 420;
       break;
     case 2:
-      bendThreshold = 3000;
+      bendThreshold = 2400;
       throwThreshold = 2.00;
       break;
     case 3:
@@ -69,11 +69,7 @@ void setup() {
       break;
   }
 
-  if(user == 2) {
-    Serial.begin(9600); //Value working for Tuva 
-  } else {
-    Serial.begin(115200);
-  }
+  Serial.begin(115200);
 
   //Vibration and flex sensor setup
   pinMode(hapticPin, OUTPUT);
@@ -90,29 +86,16 @@ void setup() {
 }
 void loop() {
   readIncomingMessage();
-
+  
   bendVal = analogRead(bendPin);
-
-  if(user == 2) {
-    // Working for Tuva
-    if(messageReceived && bendVal > bendThreshold) {
-      listenToMessage();
-    } else {
-      if(bendVal > bendThreshold){
-        isRecording = true;
-        Record();
-      }
-    }
-  } else {
-   if(messageReceived && bendVal < bendThreshold) {
+  if(messageReceived && bendVal < bendThreshold) {
      listenToMessage();
    } else {
      if(bendVal < bendThreshold){
        isRecording = true;
        Record();
      }
-   }
-  }
+    }
   
   if(!(arr[0] == 0 && arr[1] == 0 && arr[2] == 0) && !audioPlayed) {
     pulsateLights();
@@ -138,16 +121,8 @@ void Record(){
 
     lightsOn = !lightsOn;   
     delay(500);
-
-    if(user == 2) {
-      //Working for Tuva
-      if(recordingCounter > minimumRecordTime && bendVal > bendThreshold){
-        isRecording = false;
-      }
-    } else {
-      if(recordingCounter > minimumRecordTime && bendVal < bendThreshold){
-        isRecording = false;
-      }
+    if(recordingCounter > minimumRecordTime && bendVal < bendThreshold){
+      isRecording = false;
     }
 
     recordingCounter++;
@@ -324,22 +299,15 @@ void selectColor() {
     
     lightUpAllLights(pixels.Color(R, G, B), 0);
     bendVal = analogRead(bendPin);
-
-    if(user == 2) {
-      // Working for Tuva
-      if(bendVal > bendThreshold){ 
-        colorSelected = true;
-      }
-    } else {
-      if(bendVal < bendThreshold){ 
-        colorSelected = true;
-      }
+    if(bendVal < bendThreshold){ 
+      colorSelected = true;
     }
     delay(100);
 
   }
   if (colorSelected){
     vibrate(); 
+    delay(500);
     adjustColor(R, G, B);
   }
   int color[] = {R, G, B};
@@ -376,26 +344,18 @@ void adjustColor (int & R, int & G, int & B){
     y = limitValue(mpu6050.getAngleY());
     z= limitValue(mpu6050.getAngleZ());
     
-    int totalMovement = ((x + y + z) / 3)* 10; //Gets the average movement
+    int totalMovement = ((x + y + z) / 3)* 50; //Gets the average movement
     int totalValue = map(totalMovement, -360, 360, 1, 19);
     float precentage = totalValue / 10.0;
-    newR = limitRGBvalue(R*precentage);
-    newG = limitRGBvalue(G*precentage);
-    newB = limitRGBvalue(B*precentage);
+    newR = limitRGBvalue(R*precentage, R);
+    newG = limitRGBvalue(G*precentage, G);
+    newB = limitRGBvalue(B*precentage, B);
     lightUpAllLights(pixels.Color(newR, newG, newB), 0);
     delay(100);
 
     bendVal = analogRead(bendPin);
-
-    if(user == 2) {
-      //Working for Tuva
-      if(bendVal > bendThreshold){ 
-        colorAdjusted = true;
-      }
-    } else {
-      if(bendVal < bendThreshold){ 
-        colorAdjusted = true;
-      }
+    if(bendVal < bendThreshold){ 
+      colorAdjusted = true;
     }
   }
   if (colorAdjusted){
@@ -403,12 +363,13 @@ void adjustColor (int & R, int & G, int & B){
     R = newR;
     G = newG;
     B = newB;
+    delay(1000);
   }
 }
 
 void vibrate (){
   digitalWrite(hapticPin, HIGH);
-  delay(400);
+  delay(300);
   digitalWrite(hapticPin, LOW); 
 }
 
@@ -426,8 +387,9 @@ int limitValue (int value){
   }
 }
 
-int limitRGBvalue(int value){
-  return constrain(value, 10, 255); //Restrcit from not going to 0
+int limitRGBvalue(int value, int RGBvalue){
+  int lowestRGBvalue = RGBvalue * 0.1;
+  return constrain(value, lowestRGBvalue, 255); //Restrcit from not going to 0
 }
 
 float getTotalAcc(){
@@ -445,5 +407,6 @@ void sendData(int color[]){
   String payload = "message:" + String(color[0]) + "," + String(color[1]) + "," + String(color[2]);
   Serial.println();
   Serial.println(payload);
+  delay(2000);
   reset();
 }
