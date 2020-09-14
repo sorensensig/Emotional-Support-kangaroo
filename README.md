@@ -10,7 +10,7 @@ Please see the individual portfolios for more information regarding the process 
 https://ixd-2020.uqcloud.net/
 
 ## Team Exhibiton Portfolios
-Marie - https://ixd-2020.uqcloud.net/thoresen/
-Sigurd - https://ixd-2020.uqcloud.net/soerensen/
-Thomas - https://ixd-2020.uqcloud.net/saly/
-Tuva - https://ixd-2020.uqcloud.net/oedegaard/
+- Marie - https://ixd-2020.uqcloud.net/thoresen/
+- Sigurd - https://ixd-2020.uqcloud.net/soerensen/
+- Thomas - https://ixd-2020.uqcloud.net/saly/
+- Tuva - https://ixd-2020.uqcloud.net/oedegaard/
